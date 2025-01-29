@@ -8,7 +8,8 @@ return {
     },
     opts = function()
         local defaults = require("configs.neo-tree")
-        return defaults 
+        -- defaults.filesystem.filtered_items.hide_dotfiles = false
+        return defaults
     end,
     config = function(_, opts)
         require("neo-tree").setup(opts)

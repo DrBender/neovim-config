@@ -1,0 +1,12 @@
+std="vim"
+
+[rules]
+# global_usage = "allow"
+global_usage = "deny"
+multiple_statements = "allow"
+# mixed_table = "allow"
+mixed_table = "warn"
+
+[lints]
+undefined-global = "deny"
+if_same_then_else = "warn"

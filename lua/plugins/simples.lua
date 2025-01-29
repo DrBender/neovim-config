@@ -21,7 +21,6 @@ return {
         -- A completion plugin for neovim coded in Lua.
         "hrsh7th/nvim-cmp",
         config = function()
-            print("hrsh7th/nvim-cmp loading...")
             require("core.completions").setup()
         end,
         event = { "InsertEnter", "CmdlineEnter" },

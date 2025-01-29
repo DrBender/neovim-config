@@ -3,7 +3,7 @@ return {
     main = "ibl",
     opts = function()
         local conf = require("ibl.config")
-        print(conf)
+        -- print(conf)
         return conf
     end,
     config = function(_, opts)
@@ -29,7 +29,11 @@ return {
         -- local hooks = require("ibl.hooks")
         -- hooks.register(hooks.type.SCOPE_HIGHLIGHT, hooks.builtin.scope_highlight_from_extmark)
         -- require("ibl").setup(opts)
-        require("ibl").setup(config)
+        require("ibl").setup({
+        exclude = {
+            filetypes = { 'help', 'dashboard', 'neo-tree'},
+            },
+        })
         -- require("ibl").setup({
         -- use_treesitter = true,
         -- indent = { highlight = highlight, char = ""}, --"▎" },

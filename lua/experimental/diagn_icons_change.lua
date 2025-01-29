@@ -1,7 +1,4 @@
-print("Experimental/diagnostics.lua")
-
 local icons_d = require("customs.icons").diagnostics
-print(icons_d)
 vim.diagnostic.config({
     signs = {
         text = {

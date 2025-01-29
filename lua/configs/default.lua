@@ -1,4 +1,4 @@
-print("Start configs/default.lua")
+-- print("Start configs/default.lua")
 
 return {
     --leader = "space",

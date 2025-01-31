@@ -20,6 +20,7 @@ opt.fileencoding = "utf-8"
 opt.showcmd = true
 
 opt.cursorline = true
+vim.o.cursorlineopt = "both" -- highlight number and line
 
 opt.termguicolors = true
 
@@ -30,4 +31,7 @@ opt.splitbelow = true  -- horizontal split below
 vim.opt.list = true
 vim.opt.listchars = { space = "·", tab = ">-" }
 
+vim.opt.fillchars = { eob = '~', vert = '|', fold = '-' }
+
+vim.o.signcolumn ="yes"
 -- vim.notify = require("plugins.notify")

@@ -4,6 +4,7 @@ local ens_installed = {
     "cpp",
     "cmake",
     "lua",
+    "rust",
     "vim",
     "vimdoc",
     "python",

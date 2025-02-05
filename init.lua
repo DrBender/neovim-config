@@ -20,3 +20,4 @@ require("keymaps")
 
 require("experimental.diagn_icons_change")
 require("experimental.buffer_info")
+require("experimental.build.build_cmake")

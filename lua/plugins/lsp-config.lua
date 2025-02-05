@@ -90,7 +90,9 @@ return {
                 -- end,
                 capabilities = capabilities,
             })
-            lspconfig.cmake.setup({})
+            lspconfig.cmake.setup({
+                capabilities = capabilities,
+            })
             lspconfig.jsonls.setup({
                 capabilities = capabilities,
             })

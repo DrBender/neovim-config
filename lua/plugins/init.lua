@@ -19,5 +19,6 @@ return {
     { import = "plugins.code.simple" },
     { import = "plugins.code.completion" },
     { import = "plugins.code.git" },
+    { import = "plugins.code.cmake-tools" },
     -- {import = "plugins.lsp.lua_ls_conf"},
 }

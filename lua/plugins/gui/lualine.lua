@@ -7,6 +7,7 @@ return {
 
         config.options = { theme = "dracula" }
         config.options.ignore_focus = { "neo-tree" }
+        -- config.sections.lualine_b = {"buffers"}
         -- Inserts a component in lualine_c at left section
         local function ins_left(component)
             table.insert(config.sections.lualine_c, component)

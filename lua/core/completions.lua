@@ -1,3 +1,4 @@
+
 local M = {}
 M.methods = {}
 
@@ -15,7 +16,7 @@ M.config = function()
     local cmp_window = require("cmp.config.window")
     -- local cmp_mapping = require "cmp.config.mapping"
     -- vim.api.nvim_create
-    pvim.builtin.cmp = {
+    P_vim.builtin.cmp = {
         active = true,
         on_config_done = nil,
         -- enabled = function()
@@ -40,7 +41,7 @@ M.config = function()
         formatting = {
             fields = { "kind", "abbr", "menu" },
             -- max_width = 0,
-            kind_icons = pvim.icons.kind,
+            kind_icons = P_vim.icons.kind,
             source_names = {
                 nvim_lsp = "(LSP)",
                 emoji = "(Emoji)",
@@ -62,11 +63,11 @@ M.config = function()
             },
             duplicates_default = 0,
             format = function(entry, vim_item)
-                vim_item.kind = pvim.builtin.cmp.formatting.kind_icons[vim_item.kind]
+                vim_item.kind = P_vim.builtin.cmp.formatting.kind_icons[vim_item.kind]
 
-                vim_item.menu = pvim.builtin.cmp.formatting.source_names[entry.source.name]
-                vim_item.dup = pvim.builtin.cmp.formatting.duplicates[entry.source.name]
-                    or pvim.builtin.cmp.formatting.duplicates_default
+                vim_item.menu = P_vim.builtin.cmp.formatting.source_names[entry.source.name]
+                vim_item.dup = P_vim.builtin.cmp.formatting.duplicates[entry.source.name]
+                    or P_vim.builtin.cmp.formatting.duplicates_default
                 return vim_item
             end,
 
@@ -237,7 +238,7 @@ end
 function M.setup()
     local cmp = require("cmp")
     M:config()
-    cmp.setup(pvim.builtin.cmp)
+    cmp.setup(P_vim.builtin.cmp)
 
     -- if lvim.builtin.cmp.cmdline.enable then
     --   for _, option in ipairs(lvim.builtin.cmp.cmdline.options) do
@@ -254,120 +255,3 @@ function M.setup()
 end
 
 return M
-
--- return {
---     {
---         -- nvim-cmp source for neovim builtin LSP client
---         "hrsh7th/cmp-nvim-lsp",
---     },
---     {
---         -- Snippet Engine for Neovim written in Lua.
---         "L3MON4D3/LuaSnip",
---         dependencies = {
---             -- luasnip completion source for nvim-cmp
---             "saadparwaiz1/cmp_luasnip",
---             "rafamadriz/friendly-snippets",
---         },
---     },
---     {
---         -- A completion plugin for neovim coded in Lua.
---         "hrsh7th/nvim-cmp",
---         config = function()
---             local cmp = require("cmp")
---             require("luasnip.loaders.from_vscode").lazy_load()
---
---             cmp.setup({
---                 snippet = {
---                     expand = function(args)
---                         require("luasnip").lsp_expand(args.body)
---                     end,
---                 },
---                 window = {
---                     completion = cmp.config.window.bordered(),
---                     documentation = cmp.config.window.bordered(),
---                 },
---                 mapping = cmp.mapping.preset.insert({
---                     ["<C-b>"] = cmp.mapping.scroll_docs(-4),
---                     ["<C-f>"] = cmp.mapping.scroll_docs(4),
---                     ["<C-Space>"] = cmp.mapping.complete(),
---                     ["<C-e>"] = cmp.mapping.abort(),
---                     ["<CR>"] = cmp.mapping.confirm({ select = true }),
---                 }),
---                 formatting = {
---                     --
---                     fields = { "kind", "abbr", "menu" },
---                     --     max_width = 0,
---                     source_names = {
---                         nvim_lsp = "(LSP)",
---                         -- emoji = "(Emoji)",
---                         -- path = "(Path)",
---                         -- calc = "(Calc)",
---                         -- cmp_tabnine = "(Tabnine)",
---                         -- vsnip = "(Snippet)",
---                         -- luasnip = "(Snippet)",
---                         -- buffer = "(Buffer)",
---                         -- tmux = "(TMUX)",
---                         -- copilot = "(Copilot)",
---                         -- treesitter = "(TreeSitter)",
---                     },
---                     format = function(entry, vim_item)
---                         -- local max_width --считывать из конфига
---                         local max_width = 0
---                         local icons = require("icons")
---                         -- vim_item.menu = entry.source.name
---                         -- vim_item.kind = icons[vim_item.kind]
---                         vim_item.menu = source_names[entry.source.name]
---                         -- vim_item.dup =
---                         return vim_item
---                     end,
---                 },
---                 sources = cmp.config.sources({
---                     { name = "nvim_lsp" },
---                     { name = "luasnip" }, -- For luasnip users.
---                 }, {
---                     { name = "buffer" },
---                 }),
---
---                 sorting = {
---                     comparators = {
---                         cmp.config.compare.offset,
---                         cmp.config.compare.exact,
---                         cmp.config.compare.recently_used,
---                         require("clangd_extensions.cmp_scores"),
---                         cmp.config.compare.kind,
---                         cmp.config.compare.sort_text,
---                         cmp.config.compare.length,
---                         cmp.config.compare.order,
---                     },
---                 },
---             })
---             -- vim
---             -- vim.api.nvim_create_
---             -- vim.api.nvim_create
---             -- vim.api.nvim_create
---         end,
---         -- dependencies = {
---         --     "cmp-nvim-lsp",
---         --     "cmp_luasnip",
---         --     -- "cmp-buffer",
---         --     -- "cmp-path",
---         --     -- "cmp-cmdline",
---         -- },
---         -- dependencies = {
---         --     "hrsh7th/cmp-nvim-lsp",
---         --     dependencies = {
---         --         "L3MON4D3/LuaSnip",
---         --         "hrsh7th/cmp-buffer",
---         --         "hrsh7th/cmp-path",
---         --         "hrsh7th/cmp-cmdline",
---         --         "hrsh7th/cmp-nvim-lua",
---         --         "hrsh7th/cmp-emoji",
---         --         "chrisgrieser/cmp-nerdfont",
---         --         "ray-x/cmp-treesitter",
---         --         "saadparwaiz1/cmp_luasnip",
---         --         "roobert/tailwindcss-colorizer-cmp.nvim",
---         --         "Exafunction/codeium.nvim",
---         --     },
---         -- },
---     },
--- }

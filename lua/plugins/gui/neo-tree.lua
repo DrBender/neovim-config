@@ -7,7 +7,7 @@ return {
         "MunifTanjim/nui.nvim",
     },
     opts = function()
-        local defaults = require("configs.neo-tree")
+        local defaults = require("config.neo-tree")
         -- defaults.filesystem.filtered_items.hide_dotfiles = false
         return defaults
     end,

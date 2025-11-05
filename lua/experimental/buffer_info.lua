@@ -1,6 +1,6 @@
 local plugin = "Info Plugin"
-
-vim.notify = require("notify")
+local x = 10
+-- vim.notify = require("notify")
 
 -- vim.notify("This is an error message.\nSomething went wrong!", "error", {
 --     title = plugin,
@@ -46,7 +46,7 @@ end
 
 vim.api.nvim_set_keymap(
     "n",
-    "<leader>i",
+    "<leader>ib",
     "<cmd>lua ShowBufferInfo()<CR>",
     { desc = "Info Buffer", noremap = true, silent = true }
 )

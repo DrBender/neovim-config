@@ -11,7 +11,7 @@ return {
             require("telescope").load_extension("projects")
             require("telescope").setup({
                 defaults = {
-                    prompt_prefix = pvim.icons.ui.Telescope .. " ",
+                    prompt_prefix = P_vim.icons.ui.Telescope .. " ",
                     vimgrep_arguments = {
                         "rg",
                         "--color=never",
@@ -25,6 +25,7 @@ return {
                     },
                 },
                 color_devicons = true,
+                file_ignore_patterns = { "^build/", "build/", "/build/", "/target/", "target/" },
             })
         end,
         event = "VimEnter",

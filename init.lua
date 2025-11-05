@@ -1,23 +1,14 @@
-pvim = vim.deepcopy(require("configs.default"))
+P_vim = vim.deepcopy(require("config.default"))
 
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
-    vim.fn.system({
-        "git",
-        "clone",
-        "--filter=blob:none",
-        "https://github.com/folke/lazy.nvim.git",
-        "--branch=stable", -- latest stable release
-        lazypath,
-    })
-end
-vim.opt.rtp:prepend(lazypath)
-require("vim-options")
+require("config.vim-options")
+require("core.lazy")
 
 require("lazy").setup("plugins")
 
-require("keymaps")
+require("core.lsp")
+-- require("lsp.lua_ls_conf")
+require("config.keymaps")
 
-require("experimental.diagn_icons_change")
 require("experimental.buffer_info")
-require("experimental.build.build_cmake")
+require("experimental.formatter_info")
+require("experimental.user_commands")

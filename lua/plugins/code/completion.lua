@@ -1,12 +1,8 @@
 return {
-    { "solvedbiscuit71/vim-autopair" },
-    { "powerman/vim-plugin-ruscmd" },
-    { "nvim-tree/nvim-web-devicons", opts = {} },
     {
         -- nvim-cmp source for neovim builtin LSP client
         "hrsh7th/cmp-nvim-lsp",
     },
-
     {
         -- Snippet Engine for Neovim written in Lua.
         "L3MON4D3/LuaSnip",
@@ -16,13 +12,13 @@ return {
             "rafamadriz/friendly-snippets",
         },
     },
-
     {
         -- A completion plugin for neovim coded in Lua.
         "hrsh7th/nvim-cmp",
         config = function()
             require("core.completions").setup()
         end,
+
         event = { "InsertEnter", "CmdlineEnter" },
         dependencies = {
             "hrsh7th/cmp-nvim-lsp",

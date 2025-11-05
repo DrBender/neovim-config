@@ -1,11 +1,5 @@
-return {
-    -- Use Neovim as a language server to inject LSP diagnostics, code actions, and more via Lua.
-    "nvimtools/none-ls.nvim",
-    priority = 200,
-    config = function()
-        local null_ls = require("null-ls")
-
-        local no_fucks = {
+ local null_ls = require("null-ls")    
+local no_fucks = {
             method = null_ls.methods.DIAGNOSTICS,
             filetypes = { "markdown", "text", "lua" },
             generator = {
@@ -32,26 +26,4 @@ return {
                 end,
             },
         }
-
-        null_ls.register(no_fucks)
-
-        null_ls.setup({
-            sources = {
-                null_ls.builtins.formatting.stylua,
-                null_ls.builtins.diagnostics.selene,
-                -- null_ls.builtins.diagnostics.lua_ls,
-                -- null_ls.builtins.formatting.clang_format,
-                -- null_ls.builtins.diagnostics.cppcheck,
-                -- null_ls.builtins.diagnostics.cmake_lint,
-                -- null_ls.builtins.formatting.cmake_format,
-                -- null_ls.builtins.formatting.astyle,
-                -- null_ls.builtins.formatting.uncrustify,
-                -- null_ls.builtins.diagnostics.shellcheck,
-                -- null_ls.builtins.formatting.beautysh,
-                -- null_ls.builtins.formatting.shfmt,
-            },
-        })
-
-        vim.keymap.set("n", "<leader>lf", vim.lsp.buf.format, { desc = "Format Code" })
-    end,
-}
+return no_fucks

@@ -1,23 +1,21 @@
+print("Formatters")
 return {
-    -- Установите через менеджер плагинов (lazy.nvim)
     {
         "stevearc/conform.nvim",
         opts = {
             formatters_by_ft = {
                 lua = { "stylua" },
-                cpp = { "clang_format", "astyle" }, -- ← Добавлено для C++
-                c = { "clang_format", "astyle" }, -- ← И для C
-                -- javascript = { { "prettierd", "prettier" } },
-                -- typescript = { { "prettierd", "prettier" } },
+                cpp = { "clang_format" },
+                c = { "clang_format" },
                 -- python = { "isort", "black" },
             },
-            format_on_save = {
-                timeout_ms = 500,
-                lsp_fallback = true, -- Если LSP тоже умеет форматировать, использует его как запасной вариант
-            },
+            -- format_on_save = {
+            --     timeout_ms = 500,
+            --     lsp_fallback = true, -- Uses LSP as backup plan for formatting
+            -- },
             clang_format = {
                 command = "clang-format",
-                args = { "-style=file" }, -- Будет использовать .clang-format файл в проекте
+                args = { "-style=file" }, -- Use .clang-format file in project directory
             },
         },
     },

@@ -9,7 +9,7 @@ return {
         dependencies = {
             -- luasnip completion source for nvim-cmp
             "saadparwaiz1/cmp_luasnip",
-            "rafamadriz/friendly-snippets",
+            "rafamadriz/friendly-snippets", -- snippets
         },
     },
     {

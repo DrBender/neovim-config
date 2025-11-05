@@ -15,7 +15,9 @@ return {
 
     { import = "plugins.lsp.mason" },
 
+    { import = "plugins.code.clangd_extensions" },
     { import = "plugins.code.simple" },
     { import = "plugins.code.completion" },
+    { import = "plugins.code.git" },
     -- {import = "plugins.lsp.lua_ls_conf"},
 }

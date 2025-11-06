@@ -12,3 +12,6 @@ require("config.keymaps")
 require("experimental.buffer_info")
 require("experimental.formatter_info")
 require("experimental.user_commands")
+
+
+require("experimental.cmake-presets.presets_picker")

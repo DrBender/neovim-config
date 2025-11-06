@@ -24,6 +24,21 @@ return {
                 short = { show = true },
                 long = { show = true, max_length = 40 },
             },
+            cmake_executor = {
+                new_task_opts={
+                overseer = {
+                    strategy = "toggleterm",
+                    direction = "horizontal",
+                    auto_scroll = true,
+                    quit_on_exit = "success"
+                }
+                },
+                on_new_task = function (task)
+                    require("overseer").open(
+                        {enter = false, direct = "right"}
+                    ) 
+                end
+            }
         })
     end,
 }

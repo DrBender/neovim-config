@@ -6,6 +6,7 @@ return {
     { import = "plugins.gui.lualine" },
     { import = "plugins.gui.telescope" },
     { import = "plugins.gui.which-key" },
+    { import = "plugins.gui.overseer" },
 
     { import = "plugins.lsp.treesitter" },
     -- { import = "plugins.lsp.none-ls" },

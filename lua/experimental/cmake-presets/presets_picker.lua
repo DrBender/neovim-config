@@ -32,7 +32,8 @@ M.opts = {
 }
 function M.setup()
     vim.keymap.set("n", "<leader>mp", function()
-        M.show_win_cmake_presets()
+        -- M.show_win_cmake_presets()
+        M.fancy_cmake_presets()
     end, { desc = "Show CMake Presets" })
 end
 
@@ -67,12 +68,12 @@ function M.get_cmake_presets_from_cli()
 
     -- Parse output
     M.presets = {
-        configure = {},
-        build = {},
-        test = {},
-        workflow = {},
-        package = {},
-        all = {},
+        Configure = {},
+        Build = {},
+        Test = {},
+        Workflow = {},
+        Package = {},
+        All = {},
     }
 
     local current_section = nil
@@ -80,17 +81,17 @@ function M.get_cmake_presets_from_cli()
         line = line:gsub("^%s*(.-)%s*$", "%1") -- trim
         if line:match("configure presets:") then
             vim.notify("configure section", vim.log.levels.ERROR)
-            current_section = "configure"
+            current_section = "Configure"
         elseif line:match("build presets:") then
-            current_section = "build"
+            current_section = "Build"
         elseif line:match("test presets:") then
-            current_section = "test"
+            current_section = "Test"
         elseif line:match("workflow presets:") then
-            current_section = "workflow"
+            current_section = "Workflow"
         elseif line:match("package presets:") then
-            current_section = "package"
+            current_section = "Package"
         elseif line:match("^Available preset names:") then
-            current_section = "all"
+            current_section = "All"
         elseif current_section and line ~= "" and not line:match("^[%-=]") then
             local preset_name = line:match('^"([^"]+)"') or line:match("^([^%s]+)")
             local description = line:match('"%s*-%s*(.+)"') or line:match("%s*-%s*(.+)")
@@ -161,7 +162,6 @@ function M.show_win_cmake_presets()
         end
     end
 
-
     table.insert(lines, "")
     table.insert(lines, "Press <Enter> to select, <q> to close")
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
@@ -195,6 +195,62 @@ function M.show_win_cmake_presets()
         vim.api.nvim_buf_add_highlight(buf, -1, "Normal", i, 0, -1)
     end
     vim.api.nvim_buf_add_highlight(buf, -1, "Comment", #lines - 1, 0, -1)
+end
+
+-- Более красивый вариант с кастомным форматированием
+function M.fancy_cmake_presets()
+    -- local presets, err = M.get_cmake_presets_from_cli()
+    M.get_cmake_presets_from_cli()
+    -- if not M.presets then
+    --     vim.notify(err, vim.log.levels.ERROR)
+    --     return
+    -- end
+
+    -- Группируем по секциям
+    -- local sections = {}
+    -- for _, preset in ipairs(M.presets) do
+    --     if not sections[preset.section] then
+    --         sections[preset.section] = {}
+    --     end
+    --     table.insert(sections[preset.section], preset)
+    -- end
+
+    -- Создаем структурированный список
+    local menu_items = {}
+    local section_order = { "Configure", "Build", "Test", "Workflow", "Package", "All" }
+
+    for _, section_name in ipairs(section_order) do
+        if M.presets[section_name] then
+            local section_item = {
+                text = "📁 " .. section_name,
+                children = {},
+            }
+
+            for _, preset in ipairs(M.presets[section_name]) do
+                local icon = "⚡"
+                if section_name == "Build" then
+                    icon = "🔨"
+                elseif section_name == "Test" then
+                    icon = "🧪"
+                elseif section_name == "Workflow" then
+                    icon = "🔧"
+                end
+
+                table.insert(section_item.children, {
+                    text = string.format("%s %s", icon, preset.name),
+                    description = preset.description,
+                    data = {
+                        name = preset.name,
+                        type = section_name,
+                    },
+                })
+            end
+
+            table.insert(menu_items, section_item)
+        end
+    end
+
+    require("snacks").menu(menu_items, M.opts)
 end
 
 function M.select_preset(preset_name)

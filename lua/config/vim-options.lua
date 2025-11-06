@@ -36,3 +36,9 @@ vim.opt.encoding = "utf-8"
 vim.opt.fileencoding = "utf-8"
 vim.opt.showcmd = true
 
+-- Включаем Tree-sitter folding
+vim.opt.foldmethod = 'expr'       -- Установка метода сворачивания на 'expr'
+vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'  -- Использовать функцию Tree-sitter для сворачивания
+vim.opt.foldlevel = 99            -- Открыть все свёрнутые блоки по умолчанию (можно уменьшить для сворачивания)
+vim.opt.foldenable = true         -- Включить сворачивание
+

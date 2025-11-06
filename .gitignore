@@ -1,2 +1,3 @@
 tmp/*
 lua/experimental/scripts/*
+lazy-lock.json

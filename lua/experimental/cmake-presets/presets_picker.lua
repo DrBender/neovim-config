@@ -1,32 +1,39 @@
 local M = {}
-
+M.opts = {
+    title = "🎯 CMake Presets",
+    prompt = "Select preset:",
+    border = "rounded",
+    width = 70,
+    height = 18,
+    style = "minimal",
+    on_submit = function(selected)
+        if selected and selected.data then
+            M.execute_preset(selected.data.type, selected.data.name)
+        end
+    end,
+    keymaps = {
+        close = { "q", "<Esc>", "<C-c>" },
+        submit = { "<CR>", "<Space>" },
+    },
+    -- Кастомная подсветка
+    highlight = {
+        title = "SnacksTitle",
+        border = "SnacksBorder",
+        cursor = "SnacksCursor",
+        selected = "SnacksSelected",
+    },
+    icons = {
+        build = "🔨",
+        test = "🧪",
+        workflow = "🔧",
+        configure = "",
+        default = "⚡",
+    },
+}
 function M.setup()
     vim.keymap.set("n", "<leader>mp", function()
         M.show_win_cmake_presets()
     end, { desc = "Show CMake Presets" })
-end
-function M.read_presets()
-    -- Проверяем наличие файла CMakePresets.json
-    local preset_file = vim.fn.findfile("CMakePresets.json", ".;")
-    if preset_file == "" then
-        vim.notify("CMakePresets.json not found", vim.log.levels.WARN)
-        return
-    end
-
-    -- Читаем и парсим JSON файл
-    local content = vim.fn.readfile(preset_file)
-    local ok, json_data = pcall(vim.fn.json_decode, table.concat(content, "\n"))
-    if not ok then
-        vim.notify("Failed to parse CMakePresets.json", vim.log.levels.ERROR)
-        return
-    end
-    -- Извлекаем список пресетов
-    M.presets = json_data.configurePresets or {}
-
-    if vim.tbl_isempty(M.presets) then
-        vim.notify("No configure presets found", vim.log.levels.INFO)
-        return
-    end
 end
 
 function M.get_cmake_presets_from_cli()
@@ -99,7 +106,6 @@ function M.get_cmake_presets_from_cli()
 end
 
 function M.show_win_cmake_presets()
-    -- M:read_presets()
     M:get_cmake_presets_from_cli()
 
     local buf = vim.api.nvim_create_buf(false, true)
@@ -120,10 +126,10 @@ function M.show_win_cmake_presets()
         title = "CMake Presets",
         title_pos = "center",
     })
-    -- Устанавливаем опции буфера
-    vim.api.nvim_buf_set_option(buf, "filetype", "cmake-presets")
-    vim.api.nvim_buf_set_option(buf, "buftype", "nofile")
-    vim.api.nvim_buf_set_option(buf, "modifiable", true)
+    -- Buffer options
+    vim.bo[buf].filetype = "cmake-presets"
+    vim.bo[buf].buftype = "nofile"
+    vim.bo[buf].modifiable = true
 
     local section_order = { "configure", "build", "test", "workflow", "package", "all" }
     local section_names = {
@@ -154,19 +160,7 @@ function M.show_win_cmake_presets()
             table.insert(lines, line)
         end
     end
-    -- for i, preset in ipairs(M.presets) do
-    --     local type_str = string.format("%-9s", preset.type)
-    --     -- local display_name = preset.displayName or preset.name
-    --     -- local line = string.format('%d. %s (%s)', i, display_name, preset.name)
-    --     -- table.insert(lines, line)
-    --     local line = string.format("%d. %s | %s", i, type_str, preset.name)
-    --
-    --     if preset.description ~= "" then
-    --         line = line .. string.format(" - %s", preset.description)
-    --     end
-    --
-    --     table.insert(lines, line)
-    -- end
+
 
     table.insert(lines, "")
     table.insert(lines, "Press <Enter> to select, <q> to close")
@@ -204,16 +198,30 @@ function M.show_win_cmake_presets()
 end
 
 function M.select_preset(preset_name)
-    -- Здесь можно добавить логику для использования пресета
     vim.notify("Selected CMake preset: " .. preset_name, vim.log.levels.INFO)
 
-    -- Пример: установка переменной окружения
-    -- vim.fn.setenv('CMAKE_PRESET', preset_name)
-
-    -- Или выполнение команды CMake
     local command = string.format("!cmake --preset %s", preset_name)
     vim.cmd(command)
 end
 
+function M.execute_preset(preset_type, preset_name)
+    local commands = {
+        configure = "cmake --preset %s",
+        build = "cmake --build --preset %s",
+        test = "ctest --preset %s",
+        workflow = "cmake --workflow --preset %s",
+        package = "cmake --package --preset %s",
+        all = "cmake --preset %s",
+    }
+
+    local command_template = commands[preset_type] or commands.All
+    local command = string.format(command_template, preset_name)
+
+    vim.notify(string.format("Executing: %s %s", preset_type:lower(), preset_name), vim.log.levels.INFO)
+
+    vim.cmd("vsplit | terminal " .. command)
+end
+
 M:setup()
+
 return M

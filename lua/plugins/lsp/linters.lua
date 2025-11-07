@@ -1,4 +1,3 @@
-print("Linters...")
 return {
     "mfussenegger/nvim-lint",
     opts = {

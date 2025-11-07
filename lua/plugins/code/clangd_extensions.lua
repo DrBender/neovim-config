@@ -1,4 +1,3 @@
-print("clangd_extensions")
 return {
     "p00f/clangd_extensions.nvim",
     config = function()

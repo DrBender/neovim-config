@@ -1,4 +1,3 @@
-print("Formatters")
 return {
     {
         "stevearc/conform.nvim",

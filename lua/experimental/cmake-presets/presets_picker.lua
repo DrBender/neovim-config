@@ -3,12 +3,12 @@ M.opts = {
     title = "🎯 CMake Presets",
     prompt = "Select preset:",
     border = "rounded",
-    width = 70,
-    height = 18,
+    -- width = 70,
+    -- width = 10,
+    -- height = 18,
     style = "minimal",
     confirm = function(picker, item)
         if item and item.data then
-            print(item.data.type .. item.data.name)
             M.execute_preset(item.data.type, item.data.name)
         end
     end,
@@ -18,8 +18,8 @@ M.opts = {
     },
     format = function(item, picker)
         print(item.text)
-        local indent = string.rep("  ", item.level or 0) 
-        local icon = item.icon or "▪" 
+        local indent = string.rep("   ", item.level or 0)
+        local icon = item.icon or "▪"
         local name = item.text or "<unknown>"
 
         local formatted = string.format("%s%s %s", indent, icon, name)
@@ -37,12 +37,18 @@ M.opts = {
         selected = "SnacksSelected",
     },
     layout = {
-        preset = "default", -- "default" | "vertical" | "sidebar" | "vscode" | custom
+        preset = "vertical", -- "default" | "vertical" | "sidebar" | "vscode" | custom
+        -- position = "right",
         cycle = true, -- Enable cursor wrapping at list edges
         reverse = false, -- Reverse list order (bottom-up)
         fullscreen = false, -- Open in fullscreen
-        hidden = { "input" }, -- Windows to hide on open: ["input"] | ["preview"]
+        hidden = { "input", "preview" }, -- Windows to hide on open: ["input"] | ["preview"]
         auto_hide = {}, -- Windows to auto-hide when not focused: ["input"]
+    },
+    win = {
+        list = {
+            size = 0.1,
+        },
     },
 }
 M.icons = {
@@ -57,6 +63,17 @@ function M.setup()
         M.fancy_cmake_presets()
     end, { desc = "Show CMake Presets" })
 end
+local function get_project_dir()
+    local state = require("neo-tree.sources.manager").get_state("filesystem")
+    local dir = vim.fn.getcwd()
+    if state and state.path then
+        print("Root path neo-tree: " .. state.path)
+        dir = state.path
+    else
+        print("Root path neo-tree не доступен")
+    end
+    return dir
+end
 
 function M.get_cmake_presets_from_cli()
     -- Check if cmake is available
@@ -65,11 +82,11 @@ function M.get_cmake_presets_from_cli()
         return {}
     end
 
-    -- Run command: cmake --list-presets
-    local cmd = "cmake --list-presets=all"
+    M.proj_dir = get_project_dir()
+    local cmd = "cd " .. M.proj_dir .. " && cmake --list-presets=all"
     local handle = io.popen(cmd)
     if not handle then
-        vim.notify("Failed to execute cmake command", vim.log.levels.ERROR)
+        vim.notify("Failed to execute cmake command: " .. cmd, vim.log.levels.ERROR)
         return {}
     end
 
@@ -81,11 +98,11 @@ function M.get_cmake_presets_from_cli()
         return {}
     end
 
-    local preset_file = vim.fn.findfile("CMakePresets.json", ".;")
-    if preset_file == "" then
-        vim.notify("CMakePresets.json not found", vim.log.levels.WARN)
-        return
-    end
+    -- local preset_file = vim.fn.findfile("CMakePresets.json", ".;")
+    -- if preset_file == "" then
+    --     vim.notify("CMakePresets.json not found", vim.log.levels.WARN)
+    --     return
+    -- end
 
     -- Parse output
     M.presets = {
@@ -101,7 +118,6 @@ function M.get_cmake_presets_from_cli()
     for line in output:gmatch("[^\r\n]+") do
         line = line:gsub("^%s*(.-)%s*$", "%1") -- trim
         if line:match("configure presets:") then
-            vim.notify("configure section", vim.log.levels.ERROR)
             current_section = "Configure"
         elseif line:match("build presets:") then
             current_section = "Build"
@@ -127,98 +143,6 @@ function M.get_cmake_presets_from_cli()
     end
 end
 
-function M.show_win_cmake_presets()
-    M:get_cmake_presets_from_cli()
-
-    local buf = vim.api.nvim_create_buf(false, true)
-    local width = 60
-    local height = math.min(20, 20)
-    local row = math.floor((vim.o.lines - height) / 2)
-    local col = math.floor((vim.o.columns - width) / 2)
-
-    -- Window parameters
-    local win = vim.api.nvim_open_win(buf, true, {
-        relative = "editor",
-        width = width,
-        height = height,
-        row = row,
-        col = col,
-        style = "minimal",
-        border = "rounded",
-        title = "CMake Presets",
-        title_pos = "center",
-    })
-    -- Buffer options
-    vim.bo[buf].filetype = "cmake-presets"
-    vim.bo[buf].buftype = "nofile"
-    vim.bo[buf].modifiable = true
-
-    local section_order = { "configure", "build", "test", "workflow", "package", "all" }
-    local section_names = {
-        configure = "Configure",
-        build = "Build",
-        test = "Test",
-        workflow = "Workflow",
-        package = "Package",
-        all = "All",
-    }
-    -- Подготавливаем содержимое
-    local lines = {
-        "CMake Presets:",
-        "=" .. string.rep("=", width - 2),
-        "Type      | Name",
-        "----------" .. string.rep("-", width - 10),
-        "",
-    }
-    for _, section_key in ipairs(section_order) do
-        local section_presets = M.presets[section_key] or {}
-        for i, preset in ipairs(section_presets) do
-            local line = string.format("%s", preset.name)
-            -- table.insert(all_presets, {
-            --     type = section_names[section_key],
-            --     name = preset.name,
-            --     description = preset.description
-            -- })
-            table.insert(lines, line)
-        end
-    end
-
-    table.insert(lines, "")
-    table.insert(lines, "Press <Enter> to select, <q> to close")
-    vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-    -- Устанавливаем ключевые mappings
-    vim.keymap.set("n", "q", function()
-        vim.api.nvim_win_close(win, true)
-    end, { buffer = buf })
-
-    vim.keymap.set("n", "<Esc>", function()
-        vim.api.nvim_win_close(win, true)
-    end, { buffer = buf })
-
-    vim.keymap.set("n", "<CR>", function()
-        local line = vim.api.nvim_get_current_line()
-        M.select_preset(line)
-        -- local number = line:match("^(%d+)%.")
-        -- if number then
-        --     local index = tonumber(number)
-        --     local preset = M.presets[index]
-        --     if preset then
-        --         vim.api.nvim_win_close(win, true)
-        --         M.select_preset(preset.name)
-        --     end
-        -- end
-    end, { buffer = buf })
-
-    -- Подсветка
-    vim.api.nvim_buf_add_highlight(buf, -1, "Title", 0, 0, -1)
-    vim.api.nvim_buf_add_highlight(buf, -1, "Comment", 1, 0, -1)
-    for i = 3, #lines - 2 do
-        vim.api.nvim_buf_add_highlight(buf, -1, "Normal", i, 0, -1)
-    end
-    vim.api.nvim_buf_add_highlight(buf, -1, "Comment", #lines - 1, 0, -1)
-end
-
--- Более красивый вариант с кастомным форматированием
 function M.fancy_cmake_presets()
     -- local presets, err = M.get_cmake_presets_from_cli()
     M.get_cmake_presets_from_cli()
@@ -229,7 +153,7 @@ function M.fancy_cmake_presets()
 
     local menu_items = {}
     -- local section_order = { "Configure", "Build", "Test", "Workflow", "Package", "All" }
-    local section_order = { "Workflow","Configure", "Build", "Test",  "Package", "All" }
+    local section_order = { "Workflow", "Configure", "Build", "Test", "Package", "All" }
 
     for _, section_name in ipairs(section_order) do
         if M.presets[section_name] then
@@ -264,6 +188,42 @@ function M.select_preset(preset_name)
     vim.cmd(command)
 end
 
+function M.send_or_open_terminal(cmd)
+    print("1")
+    local snacks_term_bufnr = nil
+    for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+        if vim.api.nvim_buf_get_option(bufnr, "buftype") == "terminal" then
+            snacks_term_bufnr = bufnr
+            break
+        end
+    end
+    -- print("snacks_term_bufnr = " .. snacks_term_bufnr)
+
+    print("2")
+    if snacks_term_bufnr then
+        local chan = vim.b[snacks_term_bufnr].terminal_job_id
+        if chan then
+            vim.fn.chansend(chan, cmd .. "\n")
+            return
+        end
+    end
+
+    print("3")
+    -- Создание терминала с базовыми настройками
+    local term = Snacks.terminal.get({
+        name = "my-terminal",
+        -- cwd = vim.loop.cwd(), -- текущая директория
+        cwd = M.proj_dir,
+        -- shell = vim.env.SHELL, -- используемая оболочка
+        on_open = function(term)
+            term:send("ls -la") -- команда при открытии
+        end,
+    })
+    print("4")
+    -- Открытие терминала
+    term:open()
+end
+
 function M.execute_preset(preset_type, preset_name)
     local commands = {
         Configure = "cmake --preset %s",
@@ -274,11 +234,15 @@ function M.execute_preset(preset_type, preset_name)
         All = "cmake --preset %s",
     }
     local command_template = commands[preset_type] or commands.All
-    local command = string.format(command_template, preset_name)
+    local command = "cd " .. M.proj_dir .. " && " .. string.format(command_template, preset_name)
 
-    vim.notify(string.format("Executing: %s %s", preset_type:lower(), preset_name), vim.log.levels.INFO)
+    -- vim.notify(string.format("Executing: %s %s", preset_type:lower(), preset_name), vim.log.levels.INFO)
 
-    vim.cmd("vsplit | terminal " .. command)
+    vim.notify(string.format("Executing: %s", command), vim.log.levels.INFO)
+    -- vim.cmd("vsplit | terminal " .. command)
+    M.send_or_open_terminal(command)
+    -- Snacks.terminal.toggle(command)
+    -- vim.cmd("terminal "..command)
 end
 
 M:setup()

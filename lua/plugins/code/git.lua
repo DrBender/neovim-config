@@ -1,4 +1,3 @@
-print("Git")
 return {
     -- DiffView (diff-files viewer)
     {

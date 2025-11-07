@@ -1,4 +1,4 @@
-
+---@type neotree.Config.Base
 local config = {
     -- If a user has a sources list it will replace this one.
     -- Only sources listed here will be loaded.
@@ -10,8 +10,11 @@ local config = {
         "git_status",
         -- "document_symbols",
     },
-    add_blank_line_at_top = true, -- Add a blank line at the top of the tree.
+    add_blank_line_at_top = false, -- Add a blank line at the top of the tree.
     auto_clean_after_session_restore = false, -- Automatically clean up broken neo-tree buffers saved in sessions
+    clipboard = {
+        sync = "none", -- or "global"/"universal" to share a clipboard for each/all Neovim instance(s), respectively
+    },
     close_if_last_window = false, -- Close Neo-tree if it is the last window left in the tab
     default_source = "filesystem", -- you can choose a specific source `last` here which indicates the last used source
     enable_diagnostics = true,
@@ -31,15 +34,25 @@ local config = {
     hide_root_node = false, -- Hide the root node.
     retain_hidden_root_indent = false, -- IF the root node is hidden, keep the indentation anyhow.
     -- This is needed if you use expanders because they render in the indent.
-    log_level = "info", -- "trace", "debug", "info", "warn", "error", "fatal"
-    log_to_file = false, -- true, false, "/path/to/file.log", use :NeoTreeLogs to show the file
+    keep_altfile = false, -- Whether the `:h alternate-file` should stay as the file used before opening Neo-tree
+    -- The minimum level of log statements that should be logged to the log file.
+    log_level = vim.log.levels.INFO, -- or other vim.log.levels (up to .ERROR), or "trace", "debug", "info", "warn", "error", "fatal"
+    -- For usabiliity, the minimum console log level = max(log_level, INFO) unless set explicitly using a table:
+    -- log_level = {
+    --   file = vim.log.levels.INFO,
+    --   console = vim.log.levels.INFO,
+    -- },
+
+    -- true, false, "/path/to/file.log", use ':lua require("neo-tree").show_logs()' to show the file.
+    -- Default location is `vim.fn.stdpath("data") .. "/" .. "neo-tree.nvim.log"`
+    log_to_file = false,
     open_files_in_last_window = true, -- false = open files in top left window
     open_files_do_not_replace_types = { "terminal", "Trouble", "qf", "edgy" }, -- when opening files, do not use windows containing these filetypes or buftypes
     open_files_using_relative_paths = false,
     -- popup_border_style is for input and confirmation dialogs.
     -- Configurtaion of floating window is done in the individual source sections.
     -- "NC" is a special style that works well with NormalNC set
-    popup_border_style = "NC", -- "double", "none", "rounded", "shadow", "single" or "solid"
+    popup_border_style = "NC", -- "double", "rounded", "single", "solid", (or "" to use 'winborder' on Neovim v0.11+)
     resize_timer_interval = 500, -- in ms, needed for containers to redraw right aligned and faded content
     -- set to -1 to disable the resize timer entirely
     --                           -- NOTE: this will speed up to 50 ms for 1 second following a resize
@@ -58,11 +71,11 @@ local config = {
             { source = "buffers" },
             { source = "git_status" },
         },
-        content_layout = "start", -- only with `tabs_layout` = "equal", "focus"
+        content_layout = "start", -- only with `tabs_layout` = "equal", "active"
         --                start  : |/ 󰓩 bufname     \/...
         --                end    : |/     󰓩 bufname \/...
         --                center : |/   󰓩 bufname   \/...
-        tabs_layout = "equal", -- start, end, center, equal, focus
+        tabs_layout = "equal", -- start, end, center, equal, active
         --             start  : |/  a  \/  b  \/  c  \            |
         --             end    : |            /  a  \/  b  \/  c  \|
         --             center : |      /  a  \/  b  \/  c  \      |
@@ -202,6 +215,7 @@ local config = {
             folder_open = "",
             folder_empty = "󰉖",
             folder_empty_open = "󰷏",
+            use_filtered_colors = true, -- Whether to use a different highlight when the file is filtered (hidden, dotfile, etc.).
             -- The next two settings are only a fallback, if you use nvim-web-devicons and configure default icons there
             -- then these will never be used.
             default = "*",
@@ -228,6 +242,7 @@ local config = {
             -- Take values in { false (no highlight), true (only loaded),
             -- "all" (both loaded and unloaded)}. For more information,
             -- see the `show_unloaded` config of the `buffers` source.
+            use_filtered_colors = true, -- Whether to use a different highlight when the file is filtered (hidden, dotfile, etc.).
             use_git_status_colors = true,
             highlight = "NeoTreeFileName",
         },
@@ -279,6 +294,12 @@ local config = {
             text_format = " ➛ %s", -- %s will be replaced with the symlink target's path.
         },
     },
+    -- The renderer section provides the renderers that will be used to render the tree.
+    --   The first level is the node type.
+    --   For each node type, you can specify a list of components to render.
+    --       Components are rendered in the order they are specified.
+    --         The first field in each component is the name of the function to call.
+    --         The rest of the fields are passed to the function as the "config" argument.
     renderers = {
         directory = {
             { "indent" },
@@ -375,7 +396,6 @@ local config = {
             -- you can also specify border here, if you want a different setting from
             -- the global popup_border_style.
         },
-        same_level = false, -- Create and paste/move files/directories on the same level as the directory under cursor (as opposed to within the directory under cursor).
         insert_as = "child", -- Affects how nodes get inserted into the tree during creation/pasting/moving of files if the node under the cursor is a directory:
         -- "child":   Insert nodes as children of the directory under cursor.
         -- "sibling": Insert nodes  as siblings of the directory under cursor.
@@ -398,7 +418,8 @@ local config = {
                 "toggle_preview",
                 config = {
                     use_float = true,
-                    use_image_nvim = false,
+                    use_snacks_image = true,
+                    use_image_nvim = true,
                     -- title = "Neo-tree Preview", -- You can define a custom title for the preview floating window.
                 },
             },
@@ -416,8 +437,10 @@ local config = {
             -- ["t"] = "open_tab_drop",
             ["w"] = "open_with_window_picker",
             ["C"] = "close_node",
+            --["C"] = "close_all_subnodes",
             ["z"] = "close_all_nodes",
             --["Z"] = "expand_all_nodes",
+            --["Z"] = "expand_all_subnodes",
             ["R"] = "refresh",
             ["a"] = {
                 "add",
@@ -429,15 +452,18 @@ local config = {
             ["A"] = "add_directory", -- also accepts the config.show_path and config.insert_as options.
             ["d"] = "delete",
             ["r"] = "rename",
-            ["b"] = "rename_basename",
             ["y"] = "copy_to_clipboard",
             ["x"] = "cut_to_clipboard",
             ["p"] = "paste_from_clipboard",
+            ["<C-r>"] = "clear_clipboard",
             ["c"] = "copy", -- takes text input for destination, also accepts the config.show_path and config.insert_as options
             ["m"] = "move", -- takes text input for destination, also accepts the config.show_path and config.insert_as options
             ["e"] = "toggle_auto_expand_width",
             ["q"] = "close_window",
             ["?"] = "show_help",
+            -- You can sort by command name with:
+            -- ["?"] = { "show_help", config = { sorter = function(a, b) return a.mapping.text < b.mapping.text end } },
+            -- The type of a and b are neotree.Help.Mapping
             ["<"] = "prev_source",
             [">"] = "next_source",
         },
@@ -447,10 +473,11 @@ local config = {
             mappings = {
                 ["H"] = "toggle_hidden",
                 ["/"] = "fuzzy_finder",
-                ["D"] = "fuzzy_finder_directory",
+                --["/"] = {"fuzzy_finder", config = { keep_filter_on_submit = true }},
                 --["/"] = "filter_as_you_type", -- this was the default until v1.28
-                ["#"] = "fuzzy_sorter", -- fuzzy sorting using the fzy algorithm
+                ["D"] = "fuzzy_finder_directory",
                 -- ["D"] = "fuzzy_sorter_directory",
+                ["#"] = "fuzzy_sorter", -- fuzzy sorting using the fzy algorithm
                 ["f"] = "filter_on_submit",
                 ["<C-x>"] = "clear_filter",
                 ["<bs>"] = "navigate_up",
@@ -458,6 +485,7 @@ local config = {
                 ["[g"] = "prev_git_modified",
                 ["]g"] = "next_git_modified",
                 ["i"] = "show_file_details", -- see `:h neo-tree-file-actions` for options to customize the window.
+                ["b"] = "rename_basename",
                 ["o"] = { "show_help", nowait = false, config = { title = "Order by", prefix_key = "o" } },
                 ["oc"] = { "order_by_created", nowait = false },
                 ["od"] = { "order_by_diagnostics", nowait = false },
@@ -472,7 +500,22 @@ local config = {
                 ["<C-n>"] = "move_cursor_down",
                 ["<up>"] = "move_cursor_up",
                 ["<C-p>"] = "move_cursor_up",
-                ["<esc>"] = "close",
+                ["<Esc>"] = "close",
+                ["<S-CR>"] = "close_keep_filter",
+                ["<C-CR>"] = "close_clear_filter",
+                ["<C-w>"] = { "<C-S-w>", raw = true },
+                {
+                    -- normal mode mappings
+                    n = {
+                        ["j"] = "move_cursor_down",
+                        ["k"] = "move_cursor_up",
+                        ["<S-CR>"] = "close_keep_filter",
+                        ["<C-CR>"] = "close_clear_filter",
+                        ["<esc>"] = "close",
+                    },
+                },
+                -- ["<esc>"] = "noop", -- if you want to use normal mode
+                -- ["key"] = function(state, scroll_padding) ... end,
             },
         },
         async_directory_scan = "auto", -- "auto"   means refreshes are async, but it's synchronous when called from the Neotree commands.
@@ -480,31 +523,30 @@ local config = {
         -- "never"  means directory scans are never async.
         scan_mode = "shallow", -- "shallow": Don't scan into directories to detect possible empty directory a priori
         -- "deep": Scan into directories to detect empty or grouped empty directories a priori.
-        bind_to_cwd = true, -- true creates a 2-way binding between vim's cwd and neo-tree's root
+        bind_to_cwd = false, -- true creates a 2-way binding between vim's cwd and neo-tree's root
         cwd_target = {
             sidebar = "tab", -- sidebar is when position = left or right
             current = "window", -- current is when position = current
         },
-        check_gitignore_in_search = true, -- check gitignore status for files/directories when searching
+        -- check gitignore status for files/directories when searching.
         -- setting this to false will speed up searches, but gitignored
         -- items won't be marked if they are visible.
-        -- The renderer section provides the renderers that will be used to render the tree.
-        --   The first level is the node type.
-        --   For each node type, you can specify a list of components to render.
-        --       Components are rendered in the order they are specified.
-        --         The first field in each component is the name of the function to call.
-        --         The rest of the fields are passed to the function as the "config" argument.
+        check_gitignore_in_search = true,
         filtered_items = {
             visible = false, -- when true, they will just be displayed differently than normal items
             force_visible_in_empty_folder = false, -- when true, hidden files will be shown if the root folder is otherwise empty
+            children_inherit_highlights = true, -- whether children of filtered parents should inherit their parent's highlight group
             show_hidden_count = true, -- when true, the number of hidden items in each folder will be shown as the last entry
             hide_dotfiles = true,
-
-            -- hide_dotfiles = false,
             hide_gitignored = true,
-            -- hide_hidden = true, -- only works on Windows for hidden files/directories
-
-            hide_hidden = false, -- only works on Windows for hidden files/directories
+            hide_ignored = true, -- hide files that are ignored by other gitignore-like files
+            -- other gitignore-like files, in descending order of precedence.
+            ignore_files = {
+                ".neotreeignore",
+                ".ignore",
+                -- ".rgignore"
+            },
+            hide_hidden = true, -- only works on Windows for hidden files/directories
             hide_by_name = {
                 ".DS_Store",
                 "thumbs.db",
@@ -577,7 +619,7 @@ local config = {
         -- instead of relying on nvim autocmd events.
     },
     buffers = {
-        bind_to_cwd = true,
+        bind_to_cwd = false,
         follow_current_file = {
             enabled = false, -- This will find and focus the file in the active buffer every time
             --              -- the current file is changed while the tree is open.
@@ -591,8 +633,10 @@ local config = {
             mappings = {
                 ["<bs>"] = "navigate_up",
                 ["."] = "set_root",
+                ["d"] = "buffer_delete",
                 ["bd"] = "buffer_delete",
                 ["i"] = "show_file_details", -- see `:h neo-tree-file-actions` for options to customize the window.
+                ["b"] = "rename_basename",
                 ["o"] = { "show_help", nowait = false, config = { title = "Order by", prefix_key = "o" } },
                 ["oc"] = { "order_by_created", nowait = false },
                 ["od"] = { "order_by_diagnostics", nowait = false },
@@ -608,12 +652,14 @@ local config = {
             mappings = {
                 ["A"] = "git_add_all",
                 ["gu"] = "git_unstage_file",
+                ["gU"] = "git_undo_last_commit",
                 ["ga"] = "git_add_file",
                 ["gr"] = "git_revert_file",
                 ["gc"] = "git_commit",
                 ["gp"] = "git_push",
                 ["gg"] = "git_commit_and_push",
                 ["i"] = "show_file_details", -- see `:h neo-tree-file-actions` for options to customize the window.
+                ["b"] = "rename_basename",
                 ["o"] = { "show_help", nowait = false, config = { title = "Order by", prefix_key = "o" } },
                 ["oc"] = { "order_by_created", nowait = false },
                 ["od"] = { "order_by_diagnostics", nowait = false },

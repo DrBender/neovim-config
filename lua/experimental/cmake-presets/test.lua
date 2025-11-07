@@ -1,9 +1,8 @@
--- Вызов функции, например, из командной строки Neovim:
--- :lua select_example()
 local my_opts = {
     title = "🎯 CMake Presets",
     prompt = "Select preset:",
     border = "rounded",
+    width = 1,
     items = {
         { text = "Option 1", value = "a", count = 1, icon = "🔨" },
         { text = "Option 2", value = "b", count = 2, icon = "🧪" },
@@ -14,7 +13,7 @@ local my_opts = {
     format = function(item, picker)
         print(item.text)
         local indent = string.rep("  ", item.level or 0) -- Отступ 2 пробела на уровень
-        local icon = item.icon or "▪"-- Иконка типа символа
+        local icon = item.icon or "▪" -- Иконка типа символа
         local name = item.text or "<unknown>"
 
         -- Собираем финальную строку с отступом, иконкой и именем
@@ -25,13 +24,7 @@ local my_opts = {
             formatted = formatted:sub(1, 47) .. "..."
         end
         print("test")
-        return {{formatted, "Normal"}}
-        -- return {
-        --     -- { item.text, "Normal" },
-        --     { item.icon, "Text" },
-        --     { item.text, "Text" },
-        --     { " (" .. item.count .. ")", "Comment", virtual = true },
-        -- }
+        return { { formatted, "Normal" } }
     end,
     -- format = "lsp_symbol",
     preview = "preview",
@@ -40,12 +33,17 @@ local my_opts = {
     end,
     style = "minimal",
     layout = {
-        preset = "default", -- "default" | "vertical" | "sidebar" | "vscode" | custom
+        preset = "vertical", -- "default" | "vertical" | "sidebar" | "vscode" | custom
         cycle = true, -- Enable cursor wrapping at list edges
         reverse = false, -- Reverse list order (bottom-up)
         fullscreen = false, -- Open in fullscreen
-        hidden = { "input" }, -- Windows to hide on open: ["input"] | ["preview"]
+        hidden = { "input", "preview" }, -- Windows to hide on open: ["input"] | ["preview"]
         auto_hide = {}, -- Windows to auto-hide when not focused: ["input"]
+    },
+    win = {
+        list = {
+            size = 0.1,
+        },
     },
     -- highlight = {
     --     title = "SnacksTitle",
@@ -62,115 +60,43 @@ local lsp_mod = {
     auto_confirm = true,
     jump = { tagstack = true, reuse_win = true },
 }
+
+local state = require("neo-tree.sources.manager").get_state("filesystem")
+
+if state and state.path then
+    print("Root path neo-tree: " .. state.path)
+else
+    print("Root path neo-tree не доступен")
+end
+print(vim.loop.cwd())
+local opt = {
+    name = "cmake_terminal",
+    position = "bottom", -- положение
+}
+local terminal =  Snacks.terminal.get("ls -la", opt)
+-- terminal:send("ls")
+-- local terminal = Snacks.terminal.get( {
+-- name = "my-terminal",
+-- cwd = vim.loop.cwd(), -- текущая директория
+-- cwd = M.proj_dir,
+-- shell = vim.env.SHELL, -- используемая оболочка
+-- on_open = function(term)
+--     -- term:send("ls -la") -- команда при открытии
+--     --
+--     pcall(function()
+--         term:send("ls -la")
+--     end)
+-- end,
+-- })
+
+-- term:open("ls", {})
+-- if terminal then
+--     -- Терминал найден, можно с ним работать
+--     print("Терминал найден:", terminal.winid) -- Пример: id окна терминала
+-- else
+--     -- Терминал не найден
+--     print("Терминал с таким именем отсутствует")
+-- end
+-- terminal.toggle()
 -- Snacks.picker.pick(lsp_mod)
 -- Snacks.picker.pick(my_opts)
-
--- Создаем функцию для инициализации пикера
-local function init_presets_picker()
-    Snacks.picker.pick({
-        title = "Preset Selector",
-        items = {
-            -- Конфигурационные пресеты
-            {
-                text = "Configure Presets",
-                submenu = {
-                    {
-                        text = "cmake-x86-qpa",
-                        description = "CMake x86 qpa",
-                        action = function()
-                            -- Действие при выборе cmake-x86-qpa
-                            print("Selected cmake-x86-qpa")
-                        end,
-                    },
-                    {
-                        text = "cmake-x86-qws",
-                        description = "CMake x86 qws",
-                        action = function()
-                            -- Действие при выборе cmake-x86-qws
-                            print("Selected cmake-x86-qws")
-                        end,
-                    },
-                },
-            },
-            -- Пресеты сборки
-            {
-                text = "Build Presets",
-                submenu = {
-                    {
-                        text = "build-x86-qpa",
-                        action = function()
-                            -- Действие при выборе build-x86-qpa
-                            print("Selected build-x86-qpa")
-                        end,
-                    },
-                },
-            },
-            -- Пресеты workflow
-            {
-                text = "Workflow Presets",
-                submenu = {
-                    {
-                        text = "work-x86-qpa",
-                        description = "WorkFlow x86 qpa",
-                        action = function()
-                            -- Действие при выборе work-x86-qpa
-                            print("Selected work-x86-qpa")
-                        end,
-                    },
-                },
-            },
-        },
-        confirm = function(picker, item)
-            if item.action then
-                item.action()
-                picker:close()
-            end
-        end,
-    })
-end
-
--- Пример привязки клавиши для открытия пикера
-vim.keymap.set("n", "<leader>p", init_presets_picker, { desc = "Open Presets Picker" })
--- ---@type snacks.picker.lsp.Config
-
--- ---@type snacks.picker.lsp.Config
--- {
---   finder = "lsp_incoming_calls",
---   format = "lsp_symbol",
---   include_current = false,
---   workspace = true, -- this ensures the file is included in the formatter
---   auto_confirm = true,
---   jump = { tagstack = true, reuse_win = true },
--- }
---
--- M.opts = {
---     title = "🎯 CMake Presets",
---     prompt = "Select preset:",
---     border = "rounded",
---     width = 70,
---     height = 18,
---     style = "minimal",
---     on_submit = function(selected)
---         if selected and selected.data then
---             M.execute_preset(selected.data.type, selected.data.name)
---         end
---     end,
---     keymaps = {
---         close = { "q", "<Esc>", "<C-c>" },
---         submit = { "<CR>", "<Space>" },
---     },
---     -- Кастомная подсветка
---     highlight = {
---         title = "SnacksTitle",
---         border = "SnacksBorder",
---         cursor = "SnacksCursor",
---         selected = "SnacksSelected",
---     },
---     icons = {
---         build = "🔨",
---         test = "🧪",
---         workflow = "🔧",
---         configure = "",
---         default = "⚡",
---     },
--- }

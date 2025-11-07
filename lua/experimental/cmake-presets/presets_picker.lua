@@ -6,33 +6,54 @@ M.opts = {
     width = 70,
     height = 18,
     style = "minimal",
-    on_submit = function(selected)
-        if selected and selected.data then
-            M.execute_preset(selected.data.type, selected.data.name)
+    confirm = function(picker, item)
+        if item and item.data then
+            print(item.data.type .. item.data.name)
+            M.execute_preset(item.data.type, item.data.name)
         end
     end,
     keymaps = {
         close = { "q", "<Esc>", "<C-c>" },
         submit = { "<CR>", "<Space>" },
     },
-    -- Кастомная подсветка
+    format = function(item, picker)
+        print(item.text)
+        local indent = string.rep("  ", item.level or 0) 
+        local icon = item.icon or "▪" 
+        local name = item.text or "<unknown>"
+
+        local formatted = string.format("%s%s %s", indent, icon, name)
+        print(formatted)
+        if #formatted > 50 then
+            formatted = formatted:sub(1, 47) .. "..."
+        end
+        print("test")
+        return { { formatted, "Text" } }
+    end,
     highlight = {
         title = "SnacksTitle",
         border = "SnacksBorder",
         cursor = "SnacksCursor",
         selected = "SnacksSelected",
     },
-    icons = {
-        build = "🔨",
-        test = "🧪",
-        workflow = "🔧",
-        configure = "",
-        default = "⚡",
+    layout = {
+        preset = "default", -- "default" | "vertical" | "sidebar" | "vscode" | custom
+        cycle = true, -- Enable cursor wrapping at list edges
+        reverse = false, -- Reverse list order (bottom-up)
+        fullscreen = false, -- Open in fullscreen
+        hidden = { "input" }, -- Windows to hide on open: ["input"] | ["preview"]
+        auto_hide = {}, -- Windows to auto-hide when not focused: ["input"]
     },
+}
+M.icons = {
+    Build = "🔨",
+    Test = "🧪",
+    Workflow = "🔧",
+    Configure = " ",
+    Default = "⚡",
 }
 function M.setup()
     vim.keymap.set("n", "<leader>mp", function()
-        -- M.show_win_cmake_presets()
         M.fancy_cmake_presets()
     end, { desc = "Show CMake Presets" })
 end
@@ -201,56 +222,39 @@ end
 function M.fancy_cmake_presets()
     -- local presets, err = M.get_cmake_presets_from_cli()
     M.get_cmake_presets_from_cli()
-    -- if not M.presets then
-    --     vim.notify(err, vim.log.levels.ERROR)
-    --     return
-    -- end
+    if not M.presets then
+        vim.notify("Presets empty", vim.log.levels.ERROR)
+        return
+    end
 
-    -- Группируем по секциям
-    -- local sections = {}
-    -- for _, preset in ipairs(M.presets) do
-    --     if not sections[preset.section] then
-    --         sections[preset.section] = {}
-    --     end
-    --     table.insert(sections[preset.section], preset)
-    -- end
-
-    -- Создаем структурированный список
     local menu_items = {}
-    local section_order = { "Configure", "Build", "Test", "Workflow", "Package", "All" }
+    -- local section_order = { "Configure", "Build", "Test", "Workflow", "Package", "All" }
+    local section_order = { "Workflow","Configure", "Build", "Test",  "Package", "All" }
 
     for _, section_name in ipairs(section_order) do
         if M.presets[section_name] then
             local section_item = {
-                text = "📁 " .. section_name,
-                children = {},
+                icon = M.icons[section_name],
+                text = section_name .. " presets",
             }
 
+            table.insert(menu_items, section_item)
             for _, preset in ipairs(M.presets[section_name]) do
-                local icon = "⚡"
-                if section_name == "Build" then
-                    icon = "🔨"
-                elseif section_name == "Test" then
-                    icon = "🧪"
-                elseif section_name == "Workflow" then
-                    icon = "🔧"
-                end
-
-                table.insert(section_item.children, {
-                    text = string.format("%s %s", icon, preset.name),
+                table.insert(menu_items, {
+                    -- text = string.format("%s %s", icon, preset.name),
+                    text = preset.name,
                     description = preset.description,
+                    level = 1,
                     data = {
                         name = preset.name,
                         type = section_name,
                     },
                 })
             end
-
-            table.insert(menu_items, section_item)
         end
     end
-
-    require("snacks").menu(menu_items, M.opts)
+    M.opts.items = menu_items
+    Snacks.picker.pick(M.opts)
 end
 
 function M.select_preset(preset_name)
@@ -262,14 +266,13 @@ end
 
 function M.execute_preset(preset_type, preset_name)
     local commands = {
-        configure = "cmake --preset %s",
-        build = "cmake --build --preset %s",
-        test = "ctest --preset %s",
-        workflow = "cmake --workflow --preset %s",
-        package = "cmake --package --preset %s",
-        all = "cmake --preset %s",
+        Configure = "cmake --preset %s",
+        Build = "cmake --build --preset %s",
+        Test = "ctest --preset %s",
+        Workflow = "cmake --workflow --preset %s",
+        Package = "cmake --package --preset %s",
+        All = "cmake --preset %s",
     }
-
     local command_template = commands[preset_type] or commands.All
     local command = string.format(command_template, preset_name)
 

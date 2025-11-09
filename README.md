@@ -24,3 +24,6 @@ scoop update neovim
 - [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)
 - [tokyonight.nvim](https://github.com/folke/tokyonight.nvim)
 - [which-key.nvim](https://github.com/folke/which-key.nvim)
+
+### Testing
+- [edgy.nvim](https://github.com/folke/edgy.nvim)

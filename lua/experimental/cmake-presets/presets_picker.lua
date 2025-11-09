@@ -10,6 +10,7 @@ M.opts = {
     confirm = function(picker, item)
         if item and item.data then
             M.execute_preset(item.data.type, item.data.name)
+            picker:close()
         end
     end,
     keymaps = {
@@ -62,6 +63,8 @@ function M.setup()
     vim.keymap.set("n", "<leader>mp", function()
         M.fancy_cmake_presets()
     end, { desc = "Show CMake Presets" })
+    vim.env.SHELL = "powershell.exe"
+
 end
 local function get_project_dir()
     local state = require("neo-tree.sources.manager").get_state("filesystem")
@@ -210,18 +213,15 @@ function M.send_or_open_terminal(cmd)
 
     print("3")
     -- Создание терминала с базовыми настройками
-    local term = Snacks.terminal.get({
+    local term = Snacks.terminal.get(nil, {
         name = "my-terminal",
-        -- cwd = vim.loop.cwd(), -- текущая директория
-        cwd = M.proj_dir,
-        -- shell = vim.env.SHELL, -- используемая оболочка
-        on_open = function(term)
-            term:send("ls -la") -- команда при открытии
-        end,
+        cwd = M.proj_dir or vim.loop.cwd(),
     })
     print("4")
-    -- Открытие терминала
-    term:open()
+  local chan = vim.bo[term.buf].channel
+  vim.defer_fn(function()
+    vim.fn.chansend(chan, { cmd })
+  end, 100)
 end
 
 function M.execute_preset(preset_type, preset_name)
@@ -234,7 +234,7 @@ function M.execute_preset(preset_type, preset_name)
         All = "cmake --preset %s",
     }
     local command_template = commands[preset_type] or commands.All
-    local command = "cd " .. M.proj_dir .. " && " .. string.format(command_template, preset_name)
+    local command = "cd " .. M.proj_dir .. " && " .. string.format(command_template, preset_name) .. "\r\n"
 
     -- vim.notify(string.format("Executing: %s %s", preset_type:lower(), preset_name), vim.log.levels.INFO)
 

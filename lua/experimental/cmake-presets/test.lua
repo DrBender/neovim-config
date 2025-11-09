@@ -73,7 +73,7 @@ local opt = {
     name = "cmake_terminal",
     position = "bottom", -- положение
 }
-local terminal =  Snacks.terminal.get("ls -la", opt)
+-- local terminal =  Snacks.terminal.get("ls -la", opt)
 -- terminal:send("ls")
 -- local terminal = Snacks.terminal.get( {
 -- name = "my-terminal",

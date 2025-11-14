@@ -42,3 +42,12 @@ vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'  -- Использовать ф�
 vim.opt.foldlevel = 99            -- Открыть все свёрнутые блоки по умолчанию (можно уменьшить для сворачивания)
 vim.opt.foldenable = true         -- Включить сворачивание
 
+
+
+vim.g.netrw_liststyle = 3        -- древовидный список
+vim.g.netrw_browse_split = 4    -- открывать в новой вкладке
+vim.g.netrw_altv = 1          -- вертикальная панель
+vim.g.netrw_winsize = 25      -- ширина панели (в %)
+-- vim.g.netrw_home = os.getenv("HOME") .. "/.cache/netrw"  -- кэш
+-- vim.g.netrw_ssh_cmd = "ssh -p 2222"vim.g.netrw_ssh_cmd = "ssh -p 2222"
+-- ssh -o MACs=hmac-sha1 pkrv@192.168.5.56 -p 22

@@ -89,7 +89,7 @@ vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, {})
 -- vim.keymap.set("n", "<leader>h", ":ClangdSwitchSourceHeader<CR>", {})
 -- vim.keymap.set("n", "<C-Tab>", ":ClangdSwitchSourceHeader<CR>", { desc = "Clang: Switch Source/Header" })
 vim.keymap.set("n", "<leader>h", ":ClangdSwitchSourceHeader<CR>", { desc = "Clang: Switch Source/Header" })
-vim.keymap.set("n", "<leader>gsi", ":ClangdSymbolInfo<CR>", { desc = "Symbol Info" })
+vim.keymap.set("n", "<leader>csi", ":ClangdSymbolInfo<CR>", { desc = "Symbol Info" })
 
 vim.keymap.set("n", "<leader>cio", ":ClangdSetInlayHints<CR>", { desc = "Set Inlay Hints" })
 
@@ -98,3 +98,7 @@ vim.keymap.set("n", "<leader>cif", ":ClangdToggleInlayHints<CR>", { desc = "Togg
 -- vim.api.
 
 vim.keymap.set("n", "<leader>lf", vim.lsp.buf.format, { desc = "Format Code" })
+
+vim.keymap.set("n", "<leader>df", vim.diagnostic.open_float, { desc = "vim.diagnostic.open_float" })
+
+vim.api.nvim_set_keymap("n", "<leader>dd", "<cmd>Telescope diagnostics<CR>", { noremap = true, silent = true })

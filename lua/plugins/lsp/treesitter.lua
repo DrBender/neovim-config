@@ -20,7 +20,13 @@ return {
     build = ":TSUpdate",
     config = function()
         local config = require("nvim-treesitter.configs")
-        require("nvim-treesitter.install").compilers = { "clang", "gcc" }
+        require("nvim-treesitter.install").compilers = { "clang", "gcc", "css" }
+        -- Добавить ассоциацию файлов .qss с CSS парсером
+        vim.filetype.add({
+            extension = {
+                qss = "css",
+            },
+        })
         config.setup({
             auto_install = true,
             ensure_installed = ens_installed,

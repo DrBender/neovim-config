@@ -8,6 +8,7 @@ return {
     { import = "plugins.gui.which-key" },
     { import = "plugins.gui.overseer" },
     { import = "plugins.gui.edgy" },
+    {import = "plugins.gui.color-picker"},
 
     { import = "plugins.lsp.treesitter" },
     -- { import = "plugins.lsp.none-ls" },
@@ -16,6 +17,7 @@ return {
     { import = "plugins.lsp.formatters" },
 
     { import = "plugins.lsp.mason" },
+    { import = "plugins.lsp.small"},
 
     { import = "plugins.code.clangd_extensions" },
     { import = "plugins.code.simple" },

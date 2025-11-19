@@ -26,6 +26,7 @@ return {
         words = { enabled = true },
         win = {enabled = true},
         terminal = { enabled = true },
+        lazygit = {enabled = true},
     },
     keys = {
         { "<leader>e", function() Snacks.explorer() end, desc = "File Explorer", },
@@ -47,5 +48,7 @@ return {
     { "<leader>fr", function() Snacks.picker.recent() end, desc = "Recent" },
 
     { "<leader>lr", function() Snacks.picker.lsp_references() end, nowait = true, desc = "References" },
+
+{ "<leader>gl", function() Snacks.lazygit() end, nowait = true, desc = "Lazygit" },
     },
 }

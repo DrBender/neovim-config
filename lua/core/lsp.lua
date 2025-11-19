@@ -1,4 +1,3 @@
-print("LSP config")
 vim.lsp.enable({
     "lua_ls",
     "clangd",

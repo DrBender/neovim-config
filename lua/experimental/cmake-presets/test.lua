@@ -64,11 +64,11 @@ local lsp_mod = {
 local state = require("neo-tree.sources.manager").get_state("filesystem")
 
 if state and state.path then
-    print("Root path neo-tree: " .. state.path)
+    -- print("Root path neo-tree: " .. state.path)
 else
-    print("Root path neo-tree не доступен")
+    -- print("Root path neo-tree не доступен")
 end
-print(vim.loop.cwd())
+-- print(vim.loop.cwd())
 local opt = {
     name = "cmake_terminal",
     position = "bottom", -- положение

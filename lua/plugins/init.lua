@@ -1,4 +1,5 @@
 return {
+    { import = "plugins.gui.tips" },
     { import = "plugins.gui.bufferline" },
     { import = "plugins.gui.themes" },
     { import = "plugins.gui.neo-tree" },
@@ -24,6 +25,7 @@ return {
     { import = "plugins.code.completion" },
     { import = "plugins.code.git" },
     { import = "plugins.code.cmake-tools" },
-    { import = "plugins.code.peek"}
+    { import = "plugins.code.peek"},
+    { import = "plugins.code.qt"}
     -- {import = "plugins.lsp.lua_ls_conf"},
 }

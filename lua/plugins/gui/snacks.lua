@@ -45,5 +45,7 @@ return {
     -- { "<leader>fg", function() Snacks.picker.git_files() end, desc = "Find Git Files" },
     -- { "<leader>fp", function() Snacks.picker.projects() end, desc = "Projects" },
     { "<leader>fr", function() Snacks.picker.recent() end, desc = "Recent" },
+
+    { "<leader>lr", function() Snacks.picker.lsp_references() end, nowait = true, desc = "References" },
     },
 }

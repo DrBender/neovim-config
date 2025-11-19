@@ -70,10 +70,10 @@ local function get_project_dir()
     local state = require("neo-tree.sources.manager").get_state("filesystem")
     local dir = vim.fn.getcwd()
     if state and state.path then
-        print("Root path neo-tree: " .. state.path)
+        -- print("Root path neo-tree: " .. state.path)
         dir = state.path
     else
-        print("Root path neo-tree не доступен")
+        -- print("Root path neo-tree не доступен")
     end
     return dir
 end

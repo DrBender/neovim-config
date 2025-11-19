@@ -53,7 +53,7 @@ function CloseMenuBuild()
 end
 
 local Terminal = require("toggleterm.terminal").Terminal
-pvim.build_term = Terminal:new({
+P_vim.build_term = Terminal:new({
     -- cmd = "$MYSHELL && ls -l /",
     display_name = "build",
     -- dir = "/home/tech/work_repos/test/VSK_BM_SM_QNX/",
@@ -78,7 +78,7 @@ pvim.build_term = Terminal:new({
     end,
 })
 function _build_toggle()
-    pvim.build_term:toggle()
+    P_vim.build_term:toggle()
     -- build_term:open()
 end
 
@@ -88,8 +88,8 @@ _build_toggle()
 vim.keymap.set("n", "<leader>x", "<cmd>lua _build_toggle()<cr>", { noremap = true, silent = true })
 -- vim.api.nvim_set_keymap("n", "<leader>bu", "<cmd>lua _build_toggle()<cr>", { noremap = true, silent = true })
 function BuildMenu()
-    local ico = pvim.icons.kind.Property
-    local ico_run = pvim.icons.ui.Triangle
+    local ico = P_vim.icons.kind.Property
+    local ico_run = P_vim.icons.ui.Triangle
     local setups = require("experimental.build.config")
     local path = setups.scripts_path
 
@@ -120,7 +120,7 @@ function BuildMenu()
         print("Picked:" .. sel .. path)
         local dir = vim.fn.getcwd()
 
-        require("toggleterm").exec("cd " .. dir, pvim.build_term.count, 12)
+        require("toggleterm").exec("cd " .. dir, P_vim.build_term.count, 12)
         local command = ""
         if sel == ico .. " Make" then
             command = "sh " .. path .. "make.sh make"
@@ -146,7 +146,7 @@ function BuildMenu()
             command = "sh " .. path .. "run.sh"
         end
 
-        require("toggleterm").exec(command, pvim.build_term.count, 12)
+        require("toggleterm").exec(command, P_vim.build_term.count, 12)
     end
     ShowMenuBuild(configs, cb)
 end

@@ -15,5 +15,6 @@ require("experimental.user_commands")
 
 
 require("experimental.cmake-presets.presets_picker")
+require("experimental.cmake-presets.qmake-picker")
 
 require("experimental.cmake-presets.test")

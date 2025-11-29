@@ -1,6 +1,7 @@
 P_vim = vim.deepcopy(require("config.default"))
 
 require("config.vim-options")
+require("config.commands")
 require("core.lazy")
 
 require("lazy").setup("plugins")

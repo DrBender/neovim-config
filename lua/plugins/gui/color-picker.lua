@@ -6,17 +6,17 @@ return {
         event = "BufReadPre",
         opts = {},
     },
-    {
-        -- https://github.com/rachartier/tiny-devicons-auto-colors.nvim
-        "rachartier/tiny-devicons-auto-colors.nvim",
-        dependencies = {
-            "nvim-tree/nvim-web-devicons",
-        },
-        event = "VeryLazy",
-        config = function()
-            require("tiny-devicons-auto-colors").setup()
-        end,
-    },
+    -- {
+    --     -- https://github.com/rachartier/tiny-devicons-auto-colors.nvim
+    --     "rachartier/tiny-devicons-auto-colors.nvim",
+    --     dependencies = {
+    --         "nvim-tree/nvim-web-devicons",
+    --     },
+    --     event = "VeryLazy",
+    --     config = function()
+    --         require("tiny-devicons-auto-colors").setup()
+    --     end,
+    -- },
     {
         "uga-rosa/ccc.nvim",
         config = function()

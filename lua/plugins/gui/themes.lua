@@ -9,6 +9,7 @@
 -- }
 
 return {
+    -- https://github.com/folke/tokyonight.nvim
     "folke/tokyonight.nvim",
     lazy = false,
     priority = 1000,
@@ -20,7 +21,6 @@ return {
         -- vim.cmd.colorscheme("tokyonight-day")
     end,
 }
-
 
 -- lua/plugins/rose-pine.lua
 -- return {

@@ -26,6 +26,7 @@ return {
     { import = "plugins.code.git" },
     { import = "plugins.code.cmake-tools" },
     { import = "plugins.code.peek"},
-    { import = "plugins.code.qt"}
+    { import = "plugins.code.qt"},
+    { import = "plugins.code.todo-comments"}
     -- {import = "plugins.lsp.lua_ls_conf"},
 }

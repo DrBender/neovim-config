@@ -86,8 +86,6 @@ vim.keymap.set("n", "K", vim.lsp.buf.hover, {})
 vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, {})
 vim.keymap.set("n", "<leader>gr", vim.lsp.buf.references, {})
 vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, {})
--- vim.keymap.set("n", "<leader>h", ":ClangdSwitchSourceHeader<CR>", {})
--- vim.keymap.set("n", "<C-Tab>", ":ClangdSwitchSourceHeader<CR>", { desc = "Clang: Switch Source/Header" })
 vim.keymap.set("n", "<leader>h", ":ClangdSwitchSourceHeader<CR>", { desc = "Clang: Switch Source/Header" })
 vim.keymap.set("n", "<leader>csi", ":ClangdSymbolInfo<CR>", { desc = "Symbol Info" })
 

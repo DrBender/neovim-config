@@ -65,6 +65,22 @@ function findProFile(directory)
     return nil
 end
 
+local function get_project_dir()
+    local state = require("neo-tree.sources.manager").get_state("filesystem")
+    local dir = vim.fn.getcwd()
+    if state and state.path then
+        print("Root path neo-tree: " .. state.path)
+        dir = state.path
+        local folder_name = vim.fn.fnamemodify(dir, ":t")
+        print("Имя папки:", folder_name)
+        M.pro_file = folder_name .. ".pro"
+    else
+        print("Root path neo-tree не доступен")
+        M.pro_file = nil
+    end
+    return dir
+end
+
 -- function findProFile()
 --     local command
 --
@@ -90,43 +106,80 @@ function M.setup()
     end, { desc = "Show QMake Presets" })
     vim.env.SHELL = "powershell.exe"
 end
-M.configs = {
-    "Make",
-    "Make clean",
-    "QMake x86 qpa",
-    "QMake x86 qws",
-    "QMake ppc qpa",
-    "QMake ppc qws",
-}
+-- M.configs = {
+--     "Make",
+--     "Make clean",
+--     "QMake x86 qpa",
+--     "QMake x86 qws",
+--     "QMake ppc qpa",
+--     "QMake ppc qws",
+-- }
+-- M.configs = require("lua.experimental.cmake-presets.qmake-commands")
+
+M.configs = require("experimental.cmake-presets.qmake-commands")
+
 function M.qmake_presets()
     local menu_items = {}
     local icon = ""
-    for i, conf_name in ipairs(M.configs) do
+    for _, config in ipairs(M.configs) do
         table.insert(menu_items, {
-            text = string.format("[%s] %s %s", i, icon, conf_name),
+            text = string.format("[%s] %s %s", config.id, icon, config.name),
             -- text = conf_name,
             description = "",
             level = 1,
             data = {
-                num = i,
-                name = conf_name,
+                num = config.id,
+                name = config.name,
             },
         })
     end
     M.opts.items = menu_items
     Snacks.picker.pick(M.opts)
 end
+function M.send_or_open_terminal(cmd)
+    print("1")
+    local snacks_term_bufnr = nil
+    for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+        if vim.api.nvim_buf_get_option(bufnr, "buftype") == "terminal" then
+            snacks_term_bufnr = bufnr
+            break
+        end
+    end
+    -- print("snacks_term_bufnr = " .. snacks_term_bufnr)
 
-function M.execute_preset(preset_num, preset_name)
-    local commands = require("experimental.cmake-presets.qmake-commands")
+    print("2")
+    if snacks_term_bufnr then
+        local chan = vim.b[snacks_term_bufnr].terminal_job_id
+        if chan then
+            vim.fn.chansend(chan, cmd .. "\n")
+            return
+        end
+    end
+
+    print("3")
+    -- Создание терминала с базовыми настройками
+    local term = Snacks.terminal.get(nil, {
+        name = "my-terminal",
+        cwd = M.proj_dir or vim.loop.cwd(),
+    })
+    print("4")
+  local chan = vim.bo[term.buf].channel
+  vim.defer_fn(function()
+    vim.fn.chansend(chan, { cmd })
+  end, 100)
+end
+-- TODO: parse all pro files in folder
+-- show dialog to chose pro-file and show in status bar current target-pro-file
+function M.execute_preset(num, preset_name)
+    -- local commands = require("experimental.cmake-presets.qmake-commands")
     -- local commands = require("qmake-commands")
-    print("commands = " .. commands)
+    -- print("commands = " .. commands)
+    M.proj_dir = get_project_dir()
 
-    local proFile = findProFile(".")
-    if proFile then
-        print("Найден .pro файл:", proFile)
-        local command_template = commands[preset_num] or ""
-        local command = "cd " .. M.proj_dir .. " && " .. string.format(command_template, proFile) .. "\r\n"
+    if M.pro_file then
+        print("Найден .pro файл:", M.pro_file, num)
+        local command_template = (M.configs[num].path .. " " .. M.configs[num].options) or ""
+        local command = "cd " .. M.proj_dir .. " && " .. string.format(command_template, M.pro_file) .. "\r\n"
 
         -- vim.notify(string.format("Executing: %s %s", preset_type:lower(), preset_name), vim.log.levels.INFO)
 
@@ -136,9 +189,11 @@ function M.execute_preset(preset_num, preset_name)
     -- Snacks.terminal.toggle(command)
     -- vim.cmd("terminal "..command)
     else
-        print(".pro файл не найден")
+        -- print(".pro файл не найден")
     end
 end
+
+print("TEsd " .. M.configs[1].id)
 
 M:setup()
 

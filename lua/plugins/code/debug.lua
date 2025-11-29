@@ -8,7 +8,6 @@ return {
         local dap = require("dap")
         local dapui = require("dapui")
 
-        -- Конфигурация для Lua
         dap.configurations.lua = {
             {
                 type = "nlua",
@@ -27,7 +26,7 @@ return {
             callback({ type = "server", host = config.host, port = config.port })
         end
 
-        -- Автоматическое открытие/закрытие UI
+        -- Automatic open/close UI
         dap.listeners.after.event_initialized["dapui_config"] = function()
             dapui.open()
         end

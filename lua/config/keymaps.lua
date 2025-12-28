@@ -4,6 +4,7 @@ function SaveAndExit()
     -- quit all buffers
     vim.api.nvim_command(":qa")
 end
+
 function Save()
     vim.api.nvim_command(":w")
 end
@@ -100,3 +101,37 @@ vim.keymap.set("n", "<leader>lf", vim.lsp.buf.format, { desc = "Format Code" })
 vim.keymap.set("n", "<leader>df", vim.diagnostic.open_float, { desc = "vim.diagnostic.open_float" })
 
 vim.api.nvim_set_keymap("n", "<leader>dd", "<cmd>Telescope diagnostics<CR>", { noremap = true, silent = true })
+
+-- Function for terminal floating window
+local function float_term()
+    -- vim.api.nvim_open_term(cmd or '', {
+    --   direction = 'float',
+    --   float_opts = {
+    --     border = 'rounded',  -- рамка: 'single', 'rounded', 'double'
+    --     width = math.floor(vim.o.columns * 0.8),
+    --     height = math.floor(vim.o.lines * 0.8),
+    --     row = math.floor(vim.o.lines * 0.1),
+    --     col = math.floor(vim.o.columns * 0.1)
+    --   }
+    -- })
+    local filename = vim.fn.expand('%:p')
+    local width = math.floor(vim.o.columns * 0.8)
+    local height = math.floor(vim.o.lines * 0.7)
+
+    local buf = vim.api.nvim_create_buf(false, true)
+    local win = vim.api.nvim_open_win(buf, true, {
+        relative = 'editor',
+        width = width,
+        height = height,
+        col = math.floor((vim.o.columns - width) / 2),
+        row = math.floor((vim.o.lines - height) / 2 - 1),
+        style = 'minimal',
+        border = 'single'
+    })
+    vim.fn.termopen('lua "' .. filename .. '"')
+    -- vim.api.nvim_command('terminal lua %')
+    -- vim.api.nvim_command('startinsert')
+end
+
+-- Клавиши
+vim.keymap.set('n', '<leader>ml', function() float_term() end, { desc = 'Float Lua term' })

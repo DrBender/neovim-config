@@ -10,6 +10,7 @@ return {
     { import = "plugins.gui.overseer" },
     { import = "plugins.gui.edgy" },
     {import = "plugins.gui.color-picker"},
+    {import = "plugins.gui.smear-cursor"},
 
     { import = "plugins.lsp.treesitter" },
     -- { import = "plugins.lsp.none-ls" },

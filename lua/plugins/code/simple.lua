@@ -21,4 +21,6 @@ return {
             end, { expr = true, desc = "Rename ..." })
         end,
     },
+    -- TODO:https://github.com/nguyenvukhang/nvim-toggler 
+    --
 }

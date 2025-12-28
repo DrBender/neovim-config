@@ -1,7 +1,7 @@
--- Определяем конфигурацию lua_ls
+-- Config lua_ls
 return {
-    cmd = { "lua-language-server" }, -- путь к lua-language-server, убедитесь что он в PATH
-    filetypes = { "lua" },           -- ассоциируем с lua файлами
+    cmd = { "lua-language-server" }, -- lua-language-server should be in PATH
+    filetypes = { "lua" },           -- file associations
     root_markers = {
         ".git",
         ".luarc.json",
@@ -11,28 +11,28 @@ return {
         "stylua.toml",
         "selene.toml",
         "selene.yml",
-    }, -- маркеры корня проекта
+    }, -- markers for projects root
     settings = {
         Lua = {
             runtime = {
-                version = "LuaJIT",                  -- используем LuaJIT, как в Neovim
-                path = vim.split(package.path, ";"), -- путь к Lua модулям
+                version = "LuaJIT",                  -- use LuaJIT
+                path = vim.split(package.path, ";"), -- Lua modules path
             },
             diagnostics = {
-                globals = { "vim" }, -- определяем глобальную переменную vim для диагностики
+                globals = { "vim" }, -- define global varialbles for diagnostics
             },
             workspace = {
                 library = {
                     vim.fn.expand("$VIMRUNTIME/lua"), -- библиотека runtime Neovim, чтобы подсказать стандартные lua модули
-                    vim.fn.stdpath("config"),         -- конфигурация пользователя
+                    vim.fn.stdpath("config"),         -- user configuration
                 },
                 checkThirdParty = false,
             },
-            telemetry = { enable = false }, -- отключаем телеметрию
+            telemetry = { enable = false },
         },
     },
     on_attach = function(client, bufnr)
         -- Отключаем встроенное форматирование lua_ls (если планируется форматировать через null-ls)
-        client.server_capabilities.documentFormattingProvider = false
+        -- client.server_capabilities.documentFormattingProvider = false
     end,
 }

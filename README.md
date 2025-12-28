@@ -27,3 +27,8 @@ scoop update neovim
 
 ### Testing
 - [edgy.nvim](https://github.com/folke/edgy.nvim)
+- [smear-cursor.nvim](https://github.com/sphamba/smear-cursor.nvim)
+
+
+### TODO
+- Search .pro files

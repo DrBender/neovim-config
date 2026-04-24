@@ -28,6 +28,7 @@ return {
                     "cmake",
                     "jsonls",
                     "bashls",
+                    "rust_analyzer",
                 },
             })
         end,

@@ -1,6 +1,8 @@
 vim.lsp.enable({
     "lua_ls",
     "clangd",
+    "rust_analyzer",
+    "cmake",
 })
 -- local capabilities = vim.lsp.protocol.make_client_capabilities()
 --

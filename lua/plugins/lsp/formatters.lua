@@ -1,11 +1,13 @@
 return {
     {
+        -- https://github.com/stevearc/conform.nvim
         "stevearc/conform.nvim",
         opts = {
             formatters_by_ft = {
                 lua = { "stylua" },
                 cpp = { "clang_format" },
                 c = { "clang_format" },
+                rust = {"rustfmt"},
                 -- python = { "isort", "black" },
             },
             -- format_on_save = {
